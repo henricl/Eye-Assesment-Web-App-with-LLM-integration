@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eye Health Assistant</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <!-- PDF Export -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
+    /* ---------------------------
+       Root Variables
+    --------------------------- */
+    :root {
+      --mint-light: #ecfdf5;
+      --mint-lighter: #f6fefc;
+      --mint-bg: #e6fff7;
+      --mint-gradient-start: #f0fdf4;
+      --mint-gradient-end: #f0f9ff;
+
+      --teal: #0f766e;
+      --teal-dark: #0d5d57;
+      --teal-light: #14b8a6;
+
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+
+      --card-bg: #ffffff;
+      --border-light: #e2e8f0;
+
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.06);
+      --shadow-card: 0 12px 40px rgba(15, 118, 110, 0.08);
+
+      --max-width: 1400px;
+      --transition: 0.25s ease;
+    }
+
+    /* Dark mode */
+    [data-theme="dark"] {
+      --mint-light: #134e4a;
+      --mint-lighter: #1a3a38;
+      --mint-bg: #0f2928;
+      --mint-gradient-start: #0f172a;
+      --mint-gradient-end: #1e293b;
+
+      --teal: #14b8a6;
+      --teal-dark: #0f766e;
+      --teal-light: #2dd4bf;
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+
+      --card-bg: #1e293b;
+      --border-light: #334155;
+
+      --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+      --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ---------------------------
+       Global Styles
+    --------------------------- */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(150deg, var(--mint-gradient-start), var(--mint-gradient-end));
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ---------------------------
+       Disclaimer Modal
+    --------------------------- */
+    .disclaimer-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .disclaimer-modal {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-card);
+    }
+
+    .disclaimer-modal-header {
+      background: linear-gradient(135deg, var(--warning) 0%, #ea580c 100%);
+      color: white;
+      padding: 24px 28px;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .disclaimer-modal-header .material-icons {
+      font-size: 32px;
+    }
+
+    .disclaimer-modal-header h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .disclaimer-modal-content {
+      padding: 28px;
+    }
+
+    .disclaimer-modal-content p {
+      margin: 0 0 18px 0;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .disclaimer-modal-content ul {
+      margin: 0 0 24px 20px;
+      padding: 0;
+      color: var(--text-secondary);
+    }
+
+    .disclaimer-modal-content li {
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .disclaimer-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px;
+      background: var(--mint-light);
+      border-radius: var(--radius-md);
+      margin-bottom: 24px;
+      cursor: pointer;
+    }
+
+    .disclaimer-checkbox input {
+      margin-top: 3px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--teal);
+    }
+
+    .disclaimer-checkbox span {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .disclaimer-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 28px 28px;
+    }
+
+    .disclaimer-modal-actions button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ---------------------------
+       Header
+    --------------------------- */
+    .site-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 32px;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--teal-dark);
+    }
+
+    [data-theme="dark"] .brand-title {
+      color: var(--teal-light);
+    }
+
+    /* Theme Toggle Switch */
+    .theme-toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-icon {
+      font-size: 20px;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .theme-toggle-wrapper .theme-icon:first-child {
+      color: var(--warning);
+    }
+
+    [data-theme="dark"] .theme-toggle-wrapper .theme-icon:last-child {
+      color: var(--teal-light);
+    }
+
+    .theme-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      cursor: pointer;
+    }
+
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .theme-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--border-light);
+      border-radius: 28px;
+      transition: var(--transition);
+    }
+
+    .theme-slider::before {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: var(--transition);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .theme-switch input:checked + .theme-slider {
+      background: var(--teal);
+    }
+
+    .theme-switch input:checked + .theme-slider::before {
+      transform: translateX(24px);
+    }
+
+    /* ---------------------------
+       Buttons
+    --------------------------- */
+    button {
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: white;
+      padding: 14px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      background: var(--teal-dark);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--teal);
+      border: 2px solid var(--teal);
+      padding: 12px 22px;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .btn-ghost:hover {
+      background: var(--teal);
+      color: white;
+    }
+
+    .btn-icon {
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .btn-icon:hover {
+      background: var(--mint-light);
+      color: var(--teal);
+    }
+
+    /* ---------------------------
+       Hero Section
+    --------------------------- */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .hero {
+      padding: 60px 32px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-left {
+      max-width: 100%;
+    }
+
+    .hero-pill {
+      display: inline-block;
+      background: var(--mint-light);
+      color: var(--teal-dark);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    [data-theme="dark"] .hero-pill {
+      color: var(--teal-light);
+    }
+
+    .hero-title {
+      font-size: 44px;
+      font-weight: 700;
+      margin: 0 0 20px;
+      line-height: 1.15;
+      color: var(--text-primary);
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    .hero-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .hero-list li::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      position: absolute;
+      top: 8px;
+      left: 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ---------------------------
+       Eye Care Tips Carousel
+    --------------------------- */
+    .tips-carousel-section {
+      padding: 40px 0;
+      overflow: hidden;
+    }
+
+    .tips-carousel-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 0 32px;
+    }
+
+    .tips-carousel-header h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--teal-dark);
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    [data-theme="dark"] .tips-carousel-header h3 {
+      color: var(--teal-light);
+    }
+
+    .tips-track-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .tips-track {
+      display: flex;
+      gap: 20px;
+      animation: scrollTips 30s linear infinite;
+      width: max-content;
+    }
+
+    .tips-track:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes scrollTips {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    .tip-card {
+      flex-shrink: 0;
+      width: 260px;
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(15, 118, 110, 0.15);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .tip-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(20, 184, 166, 0.2);
+    }
+
+    .tip-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(15, 118, 110, 0.12);
+    }
+
+    [data-theme="dark"] .tip-card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .tip-card .tip-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--mint-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .tip-card .tip-icon .material-icons {
+      color: var(--teal);
+      font-size: 22px;
+    }
+
+    .tip-card-content h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .tip-card-content p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ---------------------------
+       Feature Sections
+    --------------------------- */
+    .feature-section {
+      padding: 60px 32px;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .feature-section-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .feature-section-header h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--teal-dark);
+      margin: 0 0 12px;
+    }
+
+    [data-theme="dark"] .feature-section-header h2 {
+      color: var(--teal-light);
+    }
+
+    .feature-section-header p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-light);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-header small {
+      font-weight: 400;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    /* ---------------------------
+       Vision Tests Card
+    --------------------------- */
+    .test-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .test-tab {
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      background: var(--mint-light);
+      color: var(--text-secondary);
+      border: none;
+    }
+
+    .test-tab.active {
+      background: var(--teal);
+      color: white;
+    }
+
+    .test-content {
+      display: none;
+    }
+
+    .test-content.active {
+      display: block;
+    }
+
+    /* Snellen Chart */
+    .snellen-chart {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      border: 1px solid var(--border-light);
+    }
+
+    [data-theme="dark"] .snellen-chart {
+      background: var(--mint-light);
+    }
+
+    .snellen-chart svg {
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+    }
+
+    .snellen-chart svg text {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      fill: var(--text-primary);
+    }
+
+    .snellen-input-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .snellen-input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .snellen-input-row input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      font-size: 16px;
+      text-transform: uppercase;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      letter-spacing: 2px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+    }
+
+    .snellen-input-row input:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    .snellen-result {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    .snellen-result.good {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    }
+
+    .snellen-result.moderate {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    }
+
+    .snellen-result.poor {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    }
+
+    [data-theme="dark"] .snellen-result.good {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    }
+
+    [data-theme="dark"] .snellen-result.moderate {
+      background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+    }
+
+    [data-theme="dark"] .snellen-result.poor {
+      background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+    }
+
+    .snellen-result-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 8px 0;
+    }
+
+    .snellen-result.good .snellen-result-value { color: var(--success); }
+    .snellen-result.moderate .snellen-result-value { color: var(--warning); }
+    .snellen-result.poor .snellen-result-value { color: var(--danger); }
+
+    .snellen-result-note {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    /* Landolt C Test */
+    .landolt-intro {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .landolt-active {
+      text-align: center;
+    }
+
+    .eye-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--mint-light);
+      color: var(--teal-dark);
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    [data-theme="dark"] .eye-badge {
+      color: var(--teal-light);
+    }
+
+    .eye-badge.left-eye {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    [data-theme="dark"] .eye-badge.left-eye {
+      background: #78350f;
+      color: #fde68a;
+    }
+
+    .level-text {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--border-light);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--teal);
+      transition: width 0.3s;
+    }
+
+    .landolt-display {
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--mint-light);
+      border-radius: var(--radius-md);
+      margin: 16px 0;
+    }
+
+    .direction-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 50px);
+      grid-template-rows: repeat(3, 50px);
+      gap: 8px;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .direction-grid button {
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      font-size: 20px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .direction-grid button:hover {
+      border-color: var(--teal);
+      background: var(--mint-light);
+    }
+
+    .direction-grid button:nth-child(5) {
+      visibility: hidden;
+    }
+
+    .landolt-results {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .result-box {
+      background: var(--mint-light);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin: 12px 0;
+    }
+
+    .result-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .result-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    /* ---------------------------
+       Chat Section
+    --------------------------- */
+    .chat-section {
+      background: var(--mint-lighter);
+    }
+
+    .chat-card {
+      display: flex;
+      flex-direction: column;
+      height: 550px;
+    }
+
+    /* Chat Toolbar */
+    .chat-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .chat-toolbar-left {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toolbar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--mint-light);
+      color: var(--teal-dark);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .toolbar-btn:hover {
+      background: var(--teal);
+      color: white;
+    }
+
+    .toolbar-btn .material-icons {
+      font-size: 18px;
+    }
+
+    [data-theme="dark"] .toolbar-btn {
+      color: var(--teal-light);
+    }
+
+    .research-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .research-toggle input {
+      accent-color: var(--teal);
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Input icon button (mic) */
+    .input-icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--mint-light);
+      border: none;
+      color: var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .input-icon-btn:hover {
+      background: var(--teal);
+      color: white;
+    }
+
+    .input-icon-btn.recording {
+      background: var(--danger);
+      color: white;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .input-icon-btn .material-icons {
+      font-size: 22px;
+    }
+
+    /* TTS Controls Bar */
+    .tts-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--teal);
+      color: white;
+    }
+
+    .tts-status {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .tts-control-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .tts-control-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .tts-control-btn .material-icons {
+      font-size: 18px;
+    }
+
+    /* Mic Error Toast */
+    .mic-error-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 9999;
+      max-width: 90%;
+      animation: slideUp 0.3s ease;
+    }
+
+    .mic-error-toast .material-icons {
+      color: var(--warning);
+      font-size: 20px;
+    }
+
+    .mic-error-toast.fade-out {
+      animation: fadeOut 0.3s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    }
+
+    .chat-log {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: var(--mint-light);
+    }
+
+    .msg-wrapper {
+      display: flex;
+      margin-bottom: 12px;
+    }
+
+    .msg-wrapper.user-wrapper {
+      justify-content: flex-end;
+    }
+
+    .msg {
+      padding: 14px 18px;
+      max-width: 80%;
+      border-radius: var(--radius-lg);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .msg.user {
+      background: var(--teal);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg.bot {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg.urgent {
+      border-left: 4px solid var(--danger);
+      background: #fee2e2;
+    }
+
+    [data-theme="dark"] .msg.urgent {
+      background: #7f1d1d;
+    }
+
+    .triage-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--mint-light);
+      color: var(--teal-dark);
+    }
+
+    [data-theme="dark"] .triage-chip {
+      color: var(--teal-light);
+    }
+
+    .triage-chip.urgent {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    [data-theme="dark"] .triage-chip.urgent {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+
+    .tts-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-hint);
+      cursor: pointer;
+      padding: 4px;
+      margin-left: 8px;
+      opacity: 0.6;
+    }
+
+    .tts-btn:hover {
+      opacity: 1;
+      color: var(--teal);
+    }
+
+    .chat-input-area {
+      display: flex;
+      padding: 16px;
+      gap: 12px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      background: var(--card-bg);
+      color: var(--text-primary);
+    }
+
+    .chat-input-area input:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    /* Loading indicator */
+    .loading-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      max-width: 200px;
+    }
+
+    .loading-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .loading-dots span {
+      width: 8px;
+      height: 8px;
+      background: var(--teal);
+      border-radius: 50%;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ---------------------------
+       Info Sections
+    --------------------------- */
+    .info-section {
+      padding: 60px 32px;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .info-section h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 32px;
+      color: var(--teal-dark);
+    }
+
+    [data-theme="dark"] .info-section h2 {
+      color: var(--teal-light);
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .info-card {
+      background: var(--card-bg);
+      padding: 28px;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .info-card h3 {
+      margin: 0 0 12px;
+      color: var(--teal);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .info-card p {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ---------------------------
+       Footer
+    --------------------------- */
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border-light);
+      margin-top: 40px;
+    }
+
+    footer strong {
+      color: var(--text-primary);
+    }
+
+    /* ---------------------------
+       Mobile Responsive
+    --------------------------- */
+    @media (max-width: 1024px) {
+      .hero-title {
+        font-size: 32px;
+      }
+
+      .feature-section-header h2 {
+        font-size: 28px;
+      }
+
+      .tip-card {
+        width: 240px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .site-header {
+        padding: 16px;
+      }
+
+      .chat-toolbar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+      }
+
+      .chat-toolbar-left {
+        justify-content: center;
+      }
+
+      .chat-toolbar-right {
+        justify-content: center;
+      }
+
+      .toolbar-btn span {
+        display: none;
+      }
+
+      .toolbar-btn {
+        padding: 10px;
+      }
+
+      .hero {
+        padding: 40px 16px 50px;
+      }
+
+      .hero-title {
+        font-size: 26px;
+      }
+
+      .hero-sub {
+        font-size: 16px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .hero-actions button {
+        width: 100%;
+      }
+
+      .feature-section {
+        padding: 40px 16px;
+      }
+
+      .feature-section-header h2 {
+        font-size: 24px;
+      }
+
+      .section-card {
+        border-radius: var(--radius-lg);
+      }
+
+      .info-section {
+        padding: 40px 16px;
+      }
+
+      .info-section h2 {
+        font-size: 24px;
+      }
+
+      .direction-grid {
+        grid-template-columns: repeat(3, 44px);
+        grid-template-rows: repeat(3, 44px);
+      }
+
+      .chat-card {
+        height: 480px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Disclaimer Modal -->
+  <div class="disclaimer-modal-overlay" id="disclaimerModal">
+    <div class="disclaimer-modal">
+      <div class="disclaimer-modal-header">
+        <i class="material-icons">warning</i>
+        <h2>Medical Disclaimer</h2>
+      </div>
+      <div class="disclaimer-modal-content">
+        <p>
+          Welcome to the Eye Health Assistant. Before you continue, please read and acknowledge the following:
+        </p>
+        <p>
+          This assistant provides <strong>general eye-health information</strong> and <strong>visual-acuity estimates only</strong>.
+          It is <u>not a doctor</u> and never gives diagnoses or prescriptions.
+        </p>
+        <ul>
+          <li>No name or personal identifiers are required.</li>
+          <li>Conversations may be stored anonymously for research purposes.</li>
+          <li>This is a <strong>research prototype</strong>, not a certified medical device.</li>
+          <li>Always consult an ophthalmologist for any eye concerns.</li>
+          <li>In case of emergency (sudden vision loss, injury, severe pain), seek immediate medical care.</li>
+        </ul>
+        <label class="disclaimer-checkbox">
+          <input type="checkbox" id="disclaimerCheckbox">
+          <span>I understand that this is not a medical device and should not replace professional eye care</span>
+        </label>
+      </div>
+      <div class="disclaimer-modal-actions">
+        <button class="btn-primary" id="acceptDisclaimerBtn" disabled>
+          Accept & Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="2" fill="none" style="color: var(--teal)"/>
+        <circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="2" style="color: var(--teal)"/>
+      </svg>
+      <span class="brand-title">Eye Health Assistant</span>
+    </div>
+
+    <div class="theme-toggle-wrapper">
+      <i class="material-icons theme-icon">light_mode</i>
+      <label class="theme-switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="theme-slider"></span>
+      </label>
+      <i class="material-icons theme-icon">dark_mode</i>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <!-- Left Side -->
+      <div class="hero-left">
+        <div class="hero-pill">Eye-related guidance only</div>
+
+        <h1 class="hero-title">
+          A gentle, safer way to ask questions about your eyes.
+        </h1>
+
+        <p class="hero-sub">
+          This assistant helps you understand typical eye symptoms through
+          cautious, ophthalmology-focused guidance — never diagnosing and
+          never suggesting medications.
+        </p>
+
+        <ul class="hero-list">
+          <li>Collects important details first — onset, pain level, vision changes.</li>
+          <li>Provides non-scary possibilities and simple, safe suggestions.</li>
+          <li>Alerts you when professional care is recommended.</li>
+        </ul>
+
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="document.getElementById('chatSection').scrollIntoView({behavior: 'smooth'})">
+            <i class="material-icons" style="font-size:20px">chat</i>
+            Start describing your eye concern
+          </button>
+          <button class="btn-ghost" onclick="document.getElementById('visionTestsSection').scrollIntoView({behavior: 'smooth'})">
+            Try visual acuity test
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Eye Care Tips Carousel -->
+    <section class="tips-carousel-section">
+      <div class="tips-carousel-header">
+        <h3>
+          <i class="material-icons">lightbulb</i>
+          Eye Care Tips & Best Practices
+        </h3>
+      </div>
+      <div class="tips-track-wrapper">
+        <div class="tips-track">
+          <!-- First set of cards -->
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">timer</i></div>
+            <div class="tip-card-content">
+              <h4>20-20-20 Rule</h4>
+              <p>Every 20 minutes, look at something 20 feet away for 20 seconds</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">wb_sunny</i></div>
+            <div class="tip-card-content">
+              <h4>Proper Lighting</h4>
+              <p>Avoid glare and ensure good lighting when using screens</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">local_drink</i></div>
+            <div class="tip-card-content">
+              <h4>Stay Hydrated</h4>
+              <p>Drinking water helps prevent dry eyes and keeps them lubricated</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">event</i></div>
+            <div class="tip-card-content">
+              <h4>Regular Eye Exams</h4>
+              <p>Visit an eye doctor every 1-2 years for comprehensive checkups</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">do_not_touch</i></div>
+            <div class="tip-card-content">
+              <h4>Don't Rub Your Eyes</h4>
+              <p>Rubbing can cause irritation and spread bacteria</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">wb_shade</i></div>
+            <div class="tip-card-content">
+              <h4>UV Protection</h4>
+              <p>Wear sunglasses outdoors to protect from harmful UV rays</p>
+            </div>
+          </div>
+          <!-- Duplicate set for seamless loop -->
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">timer</i></div>
+            <div class="tip-card-content">
+              <h4>20-20-20 Rule</h4>
+              <p>Every 20 minutes, look at something 20 feet away for 20 seconds</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">wb_sunny</i></div>
+            <div class="tip-card-content">
+              <h4>Proper Lighting</h4>
+              <p>Avoid glare and ensure good lighting when using screens</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">local_drink</i></div>
+            <div class="tip-card-content">
+              <h4>Stay Hydrated</h4>
+              <p>Drinking water helps prevent dry eyes and keeps them lubricated</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">event</i></div>
+            <div class="tip-card-content">
+              <h4>Regular Eye Exams</h4>
+              <p>Visit an eye doctor every 1-2 years for comprehensive checkups</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">do_not_touch</i></div>
+            <div class="tip-card-content">
+              <h4>Don't Rub Your Eyes</h4>
+              <p>Rubbing can cause irritation and spread bacteria</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div class="tip-icon"><i class="material-icons">wb_shade</i></div>
+            <div class="tip-card-content">
+              <h4>UV Protection</h4>
+              <p>Wear sunglasses outdoors to protect from harmful UV rays</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="info-section">
+      <h2>How it works</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>1. You describe your symptoms</h3>
+          <p>The assistant listens for redness, pain, blurry vision, discharge, light sensitivity, or other changes.</p>
+        </div>
+        <div class="info-card">
+          <h3>2. It asks key clarifying questions</h3>
+          <p>Covers onset, one/both eyes, pain level, injuries, contact lenses, and vision changes.</p>
+        </div>
+        <div class="info-card">
+          <h3>3. You receive careful, general guidance</h3>
+          <p>No diagnoses or prescriptions. Just typical possibilities and when to seek urgent care.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Safety Principles Section -->
+    <section class="info-section">
+      <h2>Safety principles</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>No diagnosis or prescriptions</h3>
+          <p>The assistant avoids medication names, dosages, or any diagnostic claims.</p>
+        </div>
+        <div class="info-card">
+          <h3>Red-flag escalation</h3>
+          <p>Sudden vision loss, trauma, or severe pain triggers urgent-care recommendations.</p>
+        </div>
+        <div class="info-card">
+          <h3>Eye-only scope</h3>
+          <p>Non-eye symptoms are politely redirected back to eye concerns.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vision Tests Section -->
+    <section class="feature-section" id="visionTestsSection">
+      <div class="feature-section-header">
+        <h2>Vision Tests</h2>
+        <p>Quick screening tests to estimate your visual acuity. For accurate results, see an eye care professional.</p>
+      </div>
+      <div class="section-card">
+        <div class="card-header">
+          <span>Choose a Test</span>
+          <small>Screening only</small>
+        </div>
+        <div class="card-body">
+          <div class="test-tabs">
+            <button class="test-tab active" onclick="switchTestTab('snellen')" id="tabSnellen">Snellen Chart</button>
+            <button class="test-tab" onclick="switchTestTab('landolt')" id="tabLandolt">Landolt C</button>
+          </div>
+
+          <!-- Snellen Test -->
+          <div class="test-content active" id="snellenContent">
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 16px;text-align:center">
+              Hold device ~40 cm away. Type the smallest line you can read clearly.
+            </p>
+            <div class="snellen-chart">
+              <svg viewBox="0 0 300 300">
+                <text x="150" y="35" font-size="45" text-anchor="middle">E</text>
+                <text x="150" y="65" font-size="32" text-anchor="middle">F P</text>
+                <text x="150" y="95" font-size="27" text-anchor="middle">T O Z</text>
+                <text x="150" y="125" font-size="22" text-anchor="middle">L P E D</text>
+                <text x="150" y="155" font-size="19" text-anchor="middle">P E C F D</text>
+                <text x="150" y="185" font-size="16" text-anchor="middle">E D F C Z P</text>
+                <text x="150" y="215" font-size="13" text-anchor="middle">F E L O P Z D</text>
+                <text x="150" y="245" font-size="11" text-anchor="middle">D E F P O T C F</text>
+                <text x="150" y="270" font-size="9" text-anchor="middle">L E C F D P T O Z</text>
+                <text x="150" y="290" font-size="8" text-anchor="middle">P T O Z L E F D C</text>
+              </svg>
+            </div>
+            <div class="snellen-input-section">
+              <div class="snellen-input-row">
+                <input type="text" id="snellenInput" placeholder="Type letters..." maxlength="20">
+                <button class="btn-primary" id="checkSnellenBtn" style="padding:12px 18px">Check</button>
+              </div>
+              <div id="snellenResult" style="display:none"></div>
+            </div>
+          </div>
+
+          <!-- Landolt C Test -->
+          <div class="test-content" id="landoltContent">
+            <!-- Intro -->
+            <div id="landoltIntro" class="landolt-intro">
+              <p style="color:var(--text-secondary);margin:0 0 16px">
+                Identify the direction of the gap in the "C" shape. Test each eye separately.
+              </p>
+              <button class="btn-primary" id="startLandoltBtn">
+                <i class="material-icons" style="font-size:18px">play_arrow</i>
+                Start Test
+              </button>
+            </div>
+
+            <!-- Active Test -->
+            <div id="landoltActive" class="landolt-active" style="display:none">
+              <div class="eye-badge" id="eyeBadge">
+                <i class="material-icons" style="font-size:18px">visibility</i>
+                <span id="eyeText">Cover LEFT eye - Testing RIGHT</span>
+              </div>
+              <div class="level-text" id="levelText">Level 1 of 8</div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+              </div>
+              <div class="landolt-display" id="landoltDisplay"></div>
+              <div class="direction-grid" id="directionGrid">
+                <button data-dir="up-left">&#8598;</button>
+                <button data-dir="up">&#8593;</button>
+                <button data-dir="up-right">&#8599;</button>
+                <button data-dir="left">&#8592;</button>
+                <button></button>
+                <button data-dir="right">&#8594;</button>
+                <button data-dir="down-left">&#8601;</button>
+                <button data-dir="down">&#8595;</button>
+                <button data-dir="down-right">&#8600;</button>
+              </div>
+              <div style="display:flex;gap:10px;justify-content:center">
+                <button class="btn-ghost" id="cantSeeBtn" style="font-size:13px;padding:8px 16px">Can't see it</button>
+                <button class="btn-ghost" id="cancelTestBtn" style="font-size:13px;padding:8px 16px">Cancel</button>
+              </div>
+            </div>
+
+            <!-- Results -->
+            <div id="landoltResults" class="landolt-results" style="display:none">
+              <h3 style="margin:0 0 16px;color:var(--teal)">Test Complete!</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="result-box">
+                  <div class="result-label">Right Eye</div>
+                  <div class="result-value" id="rightEyeResult">--</div>
+                </div>
+                <div class="result-box">
+                  <div class="result-label">Left Eye</div>
+                  <div class="result-value" id="leftEyeResult">--</div>
+                </div>
+              </div>
+              <p style="font-size:12px;color:var(--text-secondary);margin:16px 0 0">
+                This is a screening estimate only. See an eye care professional for accurate testing.
+              </p>
+              <button class="btn-primary" id="retakeTestBtn" style="margin-top:16px">
+                <i class="material-icons" style="font-size:18px">refresh</i>
+                Retake Test
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chat Section -->
+    <section class="feature-section chat-section" id="chatSection">
+      <div class="feature-section-header">
+        <h2>Chat Assistant</h2>
+        <p>Describe your eye symptoms and get general guidance. No diagnoses or prescriptions — just helpful information.</p>
+      </div>
+      <div class="section-card chat-card">
+        <div class="chat-toolbar">
+          <div class="chat-toolbar-left">
+            <button class="toolbar-btn" id="newChat" title="New Chat">
+              <i class="material-icons">add_comment</i>
+              <span>New Chat</span>
+            </button>
+            <button class="toolbar-btn" id="exportPdf" title="Export PDF">
+              <i class="material-icons">picture_as_pdf</i>
+              <span>Export</span>
+            </button>
+          </div>
+          <div class="chat-toolbar-right">
+            <label class="research-toggle" title="Research mode allows more detailed responses">
+              <input type="checkbox" id="researchMode">
+              <span>Research mode</span>
+            </label>
+          </div>
+        </div>
+        <div class="chat-log" id="log"></div>
+        <div class="chat-input-area">
+          <button class="input-icon-btn" id="micBtn" title="Voice input">
+            <i class="material-icons">mic</i>
+          </button>
+          <input type="text" id="msg" placeholder="Describe your eye concern...">
+          <button class="btn-primary" id="sendBtn" style="padding:14px 20px">
+            <i class="material-icons" style="font-size:20px">send</i>
+          </button>
+        </div>
+        <!-- TTS Controls -->
+        <div class="tts-controls" id="ttsControls" style="display:none">
+          <span class="tts-status">Playing...</span>
+          <button class="tts-control-btn" id="ttsStopBtn" title="Stop">
+            <i class="material-icons">stop</i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <strong>Eye Health Assistant</strong> — Prototype for research use only.<br>
+    This tool does not replace an ophthalmologist or emergency services.
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // === DISCLAIMER MODAL ===
+    const disclaimerModal = document.getElementById('disclaimerModal');
+    const disclaimerCheckbox = document.getElementById('disclaimerCheckbox');
+    const acceptDisclaimerBtn = document.getElementById('acceptDisclaimerBtn');
+
+    if (localStorage.getItem('disclaimerAccepted') === 'true') {
+      disclaimerModal.style.display = 'none';
+    }
+
+    disclaimerCheckbox.addEventListener('change', () => {
+      acceptDisclaimerBtn.disabled = !disclaimerCheckbox.checked;
+    });
+
+    acceptDisclaimerBtn.addEventListener('click', () => {
+      localStorage.setItem('disclaimerAccepted', 'true');
+      disclaimerModal.style.display = 'none';
+    });
+
+    // === DARK MODE ===
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    function setDarkMode(isDark) {
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      localStorage.setItem('darkMode', isDark);
+      darkModeToggle.checked = isDark;
+    }
+
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(savedDarkMode);
+
+    darkModeToggle.addEventListener('change', (e) => {
+      setDarkMode(e.target.checked);
+    });
+
+    // === TEST TABS ===
+    function switchTestTab(tab) {
+      document.getElementById('tabSnellen').classList.toggle('active', tab === 'snellen');
+      document.getElementById('tabLandolt').classList.toggle('active', tab === 'landolt');
+      document.getElementById('snellenContent').classList.toggle('active', tab === 'snellen');
+      document.getElementById('landoltContent').classList.toggle('active', tab === 'landolt');
+    }
+
+    // === SNELLEN CHART ===
+    const LINE_SCORE = ["20/200","20/100","20/70","20/50","20/40","20/30","20/25","20/20","20/15","20/10"];
+    const LINES = ["E","FP","TOZ","LPED","PECFD","EDFCZP","FELOPZD","DEFPTCF","LECFDPTOZ","PTOZLEFDC"];
+
+    function estimateVA(letters) {
+      const clean = letters.toUpperCase().replace(/[^A-Z]/g, "");
+      for (let i = LINES.length - 1; i >= 0; i--) {
+        if (clean.includes(LINES[i])) {
+          return { va: LINE_SCORE[i], line: i + 1, matched: true };
+        }
+      }
+      return { va: "Unable to determine", line: 0, matched: false };
+    }
+
+    const snellenInput = document.getElementById('snellenInput');
+    const checkSnellenBtn = document.getElementById('checkSnellenBtn');
+    const snellenResult = document.getElementById('snellenResult');
+
+    function checkSnellen() {
+      const letters = snellenInput.value.trim();
+      if (!letters) {
+        snellenResult.style.display = 'none';
+        return;
+      }
+
+      const result = estimateVA(letters);
+      let cardClass = 'good';
+      let icon = 'check_circle';
+      let desc = 'Excellent! This suggests normal or better vision.';
+
+      if (!result.matched) {
+        cardClass = 'poor';
+        icon = 'help_outline';
+        desc = 'Try typing the letters from a line you can clearly read.';
+      } else {
+        const vaNum = parseInt(result.va.split('/')[1]);
+        if (vaNum > 50) {
+          cardClass = 'poor';
+          icon = 'warning';
+          desc = 'Below average. We recommend seeing an ophthalmologist.';
+        } else if (vaNum > 25) {
+          cardClass = 'moderate';
+          icon = 'info';
+          desc = 'Moderate vision. Consider scheduling an eye exam.';
+        }
+      }
+
+      snellenResult.className = 'snellen-result ' + cardClass;
+      snellenResult.innerHTML = `
+        <i class="material-icons" style="font-size:24px">${icon}</i>
+        <div class="snellen-result-value">${result.va}</div>
+        <div>${desc}</div>
+        ${result.matched ? `<div style="font-size:12px;opacity:0.7;margin-top:4px">Line ${result.line} of 10</div>` : ''}
+        <div class="snellen-result-note">Screening only. Test each eye separately.</div>
+      `;
+      snellenResult.style.display = 'block';
+    }
+
+    checkSnellenBtn.addEventListener('click', checkSnellen);
+    snellenInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkSnellen();
+    });
+
+// === LANDOLT C TEST ===
+const landoltState = {
+  active: false,
+  currentEye: 'right',
+  level: 1,
+  maxLevel: 8,
+  correctInRow: 0,
+  wrongInRow: 0,
+  rightEyeResult: '--',
+  leftEyeResult: '--',
+  currentDirection: null,
+  highestLevelCompleted: 0 // Track highest level successfully completed
+};
+
+const LANDOLT_SIZES = [80, 65, 52, 42, 34, 28, 23, 19];
+const DIRECTIONS = ['up', 'down', 'left', 'right', 'up-left', 'up-right', 'down-left', 'down-right'];
+const DIR_ANGLES = { 'up': 0, 'up-right': 45, 'right': 90, 'down-right': 135, 'down': 180, 'down-left': 225, 'left': 270, 'up-left': 315 };
+const LEVEL_TO_VA = { 1: '20/200', 2: '20/100', 3: '20/70', 4: '20/50', 5: '20/40', 6: '20/30', 7: '20/25', 8: '20/20' };
+
+const landoltIntro = document.getElementById('landoltIntro');
+const landoltActive = document.getElementById('landoltActive');
+const landoltResults = document.getElementById('landoltResults');
+const landoltDisplay = document.getElementById('landoltDisplay');
+const eyeBadge = document.getElementById('eyeBadge');
+const eyeText = document.getElementById('eyeText');
+const levelText = document.getElementById('levelText');
+const progressFill = document.getElementById('progressFill');
+const directionGrid = document.getElementById('directionGrid');
+
+function drawLandoltC(size, direction) {
+  const angle = DIR_ANGLES[direction];
+  landoltDisplay.innerHTML = `
+    <svg viewBox="0 0 100 100" width="${size}" height="${size}">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="12"/>
+      <rect x="45" y="5" width="10" height="20" fill="var(--mint-light)" transform="rotate(${angle}, 50, 50)"/>
+    </svg>
+  `;
+  console.log(`Drawing Landolt C: size=${size}px, direction=${direction}, level=${landoltState.level}`);
+}
+
+function nextTrial() {
+  landoltState.currentDirection = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+  const size = LANDOLT_SIZES[landoltState.level - 1];
+  drawLandoltC(size, landoltState.currentDirection);
+  levelText.textContent = `Level ${landoltState.level} of ${landoltState.maxLevel}`;
+  progressFill.style.width = ((landoltState.level - 1) / landoltState.maxLevel * 100) + '%';
+}
+
+function startLandolt() {
+  landoltState.active = true;
+  landoltState.currentEye = 'right';
+  landoltState.level = 1;
+  landoltState.correctInRow = 0;
+  landoltState.wrongInRow = 0;
+  landoltState.highestLevelCompleted = 0;
+  landoltState.rightEyeResult = '--';
+  landoltState.leftEyeResult = '--';
+
+  landoltIntro.style.display = 'none';
+  landoltResults.style.display = 'none';
+  landoltActive.style.display = 'block';
+
+  eyeBadge.className = 'eye-badge';
+  eyeText.textContent = 'Cover LEFT eye - Testing RIGHT';
+
+  console.log('Starting Landolt C test');
+  nextTrial();
+}
+
+function handleDirection(dir) {
+  if (!landoltState.active) return;
+
+  console.log(`User selected: ${dir}, Correct: ${landoltState.currentDirection}, Level: ${landoltState.level}, Correct in row: ${landoltState.correctInRow}, Wrong in row: ${landoltState.wrongInRow}`);
+
+  if (dir === landoltState.currentDirection) {
+    // Correct answer
+    landoltState.correctInRow++;
+    landoltState.wrongInRow = 0;
+
+    if (landoltState.correctInRow >= 2) {
+      // Completed this level successfully
+      landoltState.highestLevelCompleted = landoltState.level;
+      console.log(`Level ${landoltState.level} completed!`);
+      
+      if (landoltState.level < landoltState.maxLevel) {
+        // Move to next level
+        landoltState.level++;
+        landoltState.correctInRow = 0;
+        console.log(`Advancing to level ${landoltState.level}`);
+        nextTrial();
+      } else {
+        // Completed maximum level - perfect vision!
+        console.log('Completed all levels!');
+        finishEye();
+        return;
+      }
+    } else {
+      // Need one more correct answer
+      nextTrial();
+    }
+  } else {
+    // Wrong answer
+    landoltState.wrongInRow++;
+    landoltState.correctInRow = 0;
+
+    if (landoltState.wrongInRow >= 3) {
+      // Failed this level after 3 wrong answers
+      console.log(`Failed level ${landoltState.level}, highest completed was ${landoltState.highestLevelCompleted}`);
+      finishEye();
+    } else {
+      // Give another chance
+      nextTrial();
+    }
+  }
+}
+
+function handleCantSee() {
+  console.log(`User can't see at level ${landoltState.level}`);
+  finishEye();
+}
+
+function finishEye() {
+  // Use the highest level completed, not the current level
+  const completedLevel = landoltState.highestLevelCompleted;
+  const va = completedLevel > 0 ? LEVEL_TO_VA[completedLevel] : '< 20/200';
+  
+  console.log(`Finishing eye: ${landoltState.currentEye}, completed level: ${completedLevel}, VA: ${va}`);
+
+  if (landoltState.currentEye === 'right') {
+    landoltState.rightEyeResult = va;
+    landoltState.currentEye = 'left';
+    landoltState.level = 1;
+    landoltState.correctInRow = 0;
+    landoltState.wrongInRow = 0;
+    landoltState.highestLevelCompleted = 0;
+
+    eyeBadge.className = 'eye-badge left-eye';
+    eyeText.textContent = 'Cover RIGHT eye - Testing LEFT';
+    console.log('Switching to left eye');
+    nextTrial();
+  } else {
+    landoltState.leftEyeResult = va;
+    console.log('Test complete!');
+    showLandoltResults();
+  }
+}
+
+function showLandoltResults() {
+  landoltState.active = false;
+  landoltActive.style.display = 'none';
+  landoltResults.style.display = 'block';
+  document.getElementById('rightEyeResult').textContent = landoltState.rightEyeResult;
+  document.getElementById('leftEyeResult').textContent = landoltState.leftEyeResult;
+}
+
+function cancelLandolt() {
+  landoltState.active = false;
+  landoltActive.style.display = 'none';
+  landoltIntro.style.display = 'block';
+}
+
+document.getElementById('startLandoltBtn').onclick = startLandolt;
+document.getElementById('retakeTestBtn').onclick = startLandolt;
+document.getElementById('cantSeeBtn').onclick = handleCantSee;
+document.getElementById('cancelTestBtn').onclick = cancelLandolt;
+
+directionGrid.querySelectorAll('button[data-dir]').forEach(btn => {
+  btn.onclick = () => handleDirection(btn.dataset.dir);
+});
+    // === CHAT ===
+    const log = document.getElementById('log');
+    const msgInput = document.getElementById('msg');
+    const sendBtn = document.getElementById('sendBtn');
+    const newChatBtn = document.getElementById('newChat');
+    const exportBtn = document.getElementById('exportPdf');
+    const researchMode = document.getElementById('researchMode');
+
+    let state = { sessionId: null, localMessages: [] };
+
+    function addMessage(role, text, urgent = false) {
+      const wrapper = document.createElement('div');
+      wrapper.className = `msg-wrapper ${role === 'user' ? 'user-wrapper' : 'bot-wrapper'}`;
+
+      const div = document.createElement('div');
+      div.className = `msg ${role} ${urgent ? 'urgent' : ''}`;
+      div.innerHTML = text.replace(/\n/g, '<br>');
+
+      if (role === 'bot') {
+        const ttsBtn = document.createElement('button');
+        ttsBtn.className = 'tts-btn';
+        ttsBtn.innerHTML = '<i class="material-icons" style="font-size:16px">volume_up</i>';
+        ttsBtn.title = 'Read aloud';
+        ttsBtn.onclick = () => speakText(text, ttsBtn);
+        wrapper.appendChild(div);
+        wrapper.appendChild(ttsBtn);
+      } else {
+        wrapper.appendChild(div);
+      }
+
+      log.appendChild(wrapper);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // TTS Controls
+    const ttsControls = document.getElementById('ttsControls');
+    const ttsStopBtn = document.getElementById('ttsStopBtn');
+    let currentUtterance = null;
+
+    function speakText(text, btn) {
+      if ('speechSynthesis' in window) {
+        const clean = text.replace(/<[^>]*>/g, '').replace(/TRIAGE_JSON:[\s\S]*/g, '');
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.rate = 0.9;
+
+        speechSynthesis.cancel();
+        currentUtterance = utterance;
+
+        // Show TTS controls
+        ttsControls.style.display = 'flex';
+
+        utterance.onend = () => {
+          ttsControls.style.display = 'none';
+          currentUtterance = null;
+        };
+
+        utterance.onerror = () => {
+          ttsControls.style.display = 'none';
+          currentUtterance = null;
+        };
+
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    ttsStopBtn.onclick = () => {
+      speechSynthesis.cancel();
+      ttsControls.style.display = 'none';
+      currentUtterance = null;
+    };
+
+    // === VOICE INPUT (MIC) ===
+    const micBtn = document.getElementById('micBtn');
+    let recognition = null;
+    let isRecording = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+        msgInput.value = transcript;
+
+        // If final result, stop recording
+        if (event.results[event.results.length - 1].isFinal) {
+          stopRecording();
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        stopRecording();
+
+        // Show user-friendly error messages
+        let errorMsg = 'Voice input error. ';
+        switch(event.error) {
+          case 'network':
+            errorMsg += 'Network error - voice input requires HTTPS and internet connection.';
+            break;
+          case 'not-allowed':
+          case 'permission-denied':
+            errorMsg += 'Microphone access denied. Please allow microphone access in your browser settings.';
+            break;
+          case 'no-speech':
+            errorMsg += 'No speech detected. Please try again.';
+            break;
+          case 'audio-capture':
+            errorMsg += 'No microphone found. Please check your microphone.';
+            break;
+          default:
+            errorMsg += 'Please try again or type your message.';
+        }
+
+        // Show error in a toast-like notification
+        showMicError(errorMsg);
+      };
+
+      recognition.onend = () => {
+        stopRecording();
+      };
+    }
+
+    function showMicError(message) {
+      // Create toast notification
+      const toast = document.createElement('div');
+      toast.className = 'mic-error-toast';
+      toast.innerHTML = `<i class="material-icons">error_outline</i><span>${message}</span>`;
+      document.body.appendChild(toast);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+
+    function startRecording() {
+      if (recognition && !isRecording) {
+        isRecording = true;
+        micBtn.classList.add('recording');
+        micBtn.innerHTML = '<i class="material-icons">stop</i>';
+        try {
+          recognition.start();
+        } catch(e) {
+          stopRecording();
+          showMicError('Could not start voice input. Please try again.');
+        }
+      }
+    }
+
+    function stopRecording() {
+      if (isRecording) {
+        isRecording = false;
+        micBtn.classList.remove('recording');
+        micBtn.innerHTML = '<i class="material-icons">mic</i>';
+        if (recognition) {
+          try { recognition.stop(); } catch(e) {}
+        }
+      }
+    }
+
+    micBtn.onclick = () => {
+      if (!recognition) {
+        showMicError('Voice input is not supported in this browser. Please use Chrome or Edge.');
+        return;
+      }
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    };
+
+    function newChat() {
+      log.innerHTML = '';
+      state = { sessionId: null, localMessages: [] };
+      addMessage('bot',
+        "Hello! I'm your Eye Health Assistant.<br><br>" +
+        "I can help with visual acuity tests and questions about eye symptoms.<br><br>" +
+        "How can I help you today?"
+      );
+    }
+
+    let loadingEl = null;
+
+    function showLoading() {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'msg-wrapper bot-wrapper';
+      wrapper.id = 'loading-wrapper';
+      wrapper.innerHTML = `
+        <div class="loading-indicator">
+          <div class="loading-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span style="font-size:13px;color:var(--text-secondary)">Thinking...</span>
+        </div>
+      `;
+      log.appendChild(wrapper);
+      log.scrollTop = log.scrollHeight;
+      loadingEl = wrapper;
+    }
+
+    function hideLoading() {
+      if (loadingEl) {
+        loadingEl.remove();
+        loadingEl = null;
+      }
+    }
+
+    async function sendMessage() {
+      let text = msgInput.value.trim();
+      if (!text) return;
+
+      // Quick Snellen shortcut
+      const rawLetters = text.toUpperCase().replace(/[^A-Z]/g, '');
+      if (rawLetters.length >= 3 && rawLetters.length <= 12 && /^[EFPTOZLCD]+$/.test(rawLetters)) {
+        const result = estimateVA(text);
+        addMessage('user', text);
+        addMessage('bot',
+          `Your letters correspond roughly to <strong>${result.va}</strong>.<br><br>` +
+          "This is only a screening estimate. Professional testing is more accurate.<br><br>" +
+          "Is there anything else bothering your eyes?"
+        );
+        msgInput.value = '';
+        return;
+      }
+
+      addMessage('user', text);
+      state.localMessages.push({ role: 'user', content: text });
+      msgInput.value = '';
+      sendBtn.disabled = true;
+
+      showLoading();
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: state.sessionId,
+            message: text,
+            mode: researchMode.checked ? 'research' : 'normal'
+          })
+        });
+
+        const data = await res.json();
+        hideLoading();
+
+        if (data.sessionId) state.sessionId = data.sessionId;
+
+        if (data.error) {
+          addMessage('bot', 'Sorry, there was a server problem. Please try again.');
+        } else if (data.blocked) {
+          addMessage('bot', data.content || "I'm not allowed to answer that.");
+        } else {
+          const reply = (data.content || '').trim() || 'Sorry, something went wrong.';
+          const triage = data.triage;
+          const urgent = triage === 'urgent-24h' || triage === 'emergency-now';
+
+          addMessage('bot', reply, urgent);
+
+          if (triage && triage !== 'unknown' && triage !== 'null') {
+            const triageLabel = triage.replace(/-/g, ' ');
+            const chipClass = urgent ? 'triage-chip urgent' : 'triage-chip';
+            addMessage('bot', `<span class="${chipClass}">${triageLabel}</span>`);
+          }
+
+          state.localMessages.push({ role: 'assistant', content: reply });
+        }
+      } catch (e) {
+        hideLoading();
+        addMessage('bot', 'Connection problem - please try again.');
+      }
+
+      sendBtn.disabled = false;
+    }
+
+    // PDF Export
+    exportBtn.onclick = () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      pdf.setFontSize(16);
+      pdf.text('Eye Health Assistant - Chat Record', 20, 20);
+      pdf.setFontSize(10);
+      pdf.text(`Date: ${new Date().toLocaleString()}`, 20, 30);
+      let y = 50;
+      document.querySelectorAll('.msg').forEach(m => {
+        const t = m.textContent.trim();
+        if (!t) return;
+        const lines = pdf.splitTextToSize(t, 170);
+        pdf.text(lines, 20, y);
+        y += lines.length * 5 + 8;
+        if (y > 270) { pdf.addPage(); y = 20; }
+      });
+      pdf.save('eye-chat-' + Date.now() + '.pdf');
+    };
+
+    sendBtn.onclick = sendMessage;
+    msgInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    newChatBtn.onclick = newChat;
+
+    // Init
+    newChat();
+  </script>
+
+</body>
+</html>

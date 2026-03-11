@@ -1,0 +1,19 @@
+{
+  "name": "eye-symptom-assistant",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "firebase:deploy": "firebase deploy --project eye-symptom-assistant",
+    "firebase:deploy:hosting": "firebase deploy --only hosting --project eye-symptom-assistant",
+    "firebase:deploy:functions": "firebase deploy --only functions --project eye-symptom-assistant",
+    "deploy": "npm run firebase:deploy"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2"
+  }
+}

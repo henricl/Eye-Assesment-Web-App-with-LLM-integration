@@ -1,0 +1,401 @@
+
+
+/* ---------------------------
+   Root Variables
+--------------------------- */
+:root {
+  --mint-light: #ecfdf5;
+  --mint-lighter: #f6fefc;
+  --mint-bg: #e6fff7;
+  --mint-gradient-start: #f0fdf4;
+  --mint-gradient-end: #f0f9ff;
+
+  --teal: #0f766e;
+  --teal-dark: #0d5d57;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+
+  --card-bg: #ffffff;
+  --border-light: #e2e8f0;
+
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 12px 40px rgba(15, 118, 110, 0.06);
+
+  --max-width: 1320px;
+  --transition: 0.25s ease;
+}
+
+/* ---------------------------
+   Global Styles
+--------------------------- */
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(
+    150deg,
+    var(--mint-gradient-start),
+    var(--mint-gradient-end)
+  );
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* Global utilities */
+.wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ============================================================================
+   HEADER
+============================================================================ */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 24px;
+  background: transparent;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--teal-dark);
+}
+
+.brand-sub {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: -4px;
+}
+
+.nav-right {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.research-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ============================================================================
+   BUTTONS
+============================================================================ */
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.btn-primary {
+  background: var(--teal);
+  color: white;
+  padding: 12px 22px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.btn-primary:hover {
+  background: var(--teal-dark);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--teal);
+  border: 2px solid var(--teal);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+.btn-ghost:hover {
+  background: var(--teal);
+  color: white;
+}
+
+/* Small primary for chat send button */
+.small-btn {
+  padding: 10px 16px !important;
+  font-size: 14px;
+}
+
+/* ============================================================================
+   HERO SECTION
+============================================================================ */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 40px 24px 80px;
+  gap: 48px;
+}
+
+.hero-left {
+  flex: 1;
+  max-width: 560px;
+}
+
+.hero-pill {
+  background: var(--mint-light);
+  color: var(--teal-dark);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hero-title {
+  font-size: 42px;
+  font-weight: 700;
+  margin: 22px 0 16px;
+  line-height: 1.2;
+}
+
+.hero-sub {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.hero-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 28px;
+}
+
+.hero-list li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.hero-list li span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+  position: absolute;
+  top: 8px;
+  left: 0;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  margin: 26px 0;
+}
+
+/* Disclaimer box inside hero */
+.disclaimer-card {
+  background: var(--mint-lighter);
+  padding: 18px 22px;
+  border-radius: var(--radius-lg);
+  border-left: 5px solid var(--teal);
+  box-shadow: var(--shadow-soft);
+  margin-top: 32px;
+}
+
+.disclaimer-card ul {
+  margin: 10px 0 0 18px;
+  padding: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   HERO RIGHT — SNELLEN & CHAT CARDS
+============================================================================ */
+.hero-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Floating card style */
+.floating-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 26px 30px;
+  box-shadow: var(--shadow-card);
+  width: 100%;
+}
+
+/* Card headers */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Snellen */
+.snellen-instructions {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 8px 0 16px;
+}
+
+.snellen-chart svg {
+  width: 100%;
+  height: auto;
+}
+
+/* ============================================================================
+   CHAT CARD
+============================================================================ */
+.chat-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+}
+
+.log {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: var(--mint-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.msg {
+  padding: 12px 16px;
+  max-width: 75%;
+  border-radius: var(--radius-lg);
+  margin-bottom: 10px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.msg.user {
+  background: var(--teal);
+  color: white;
+  align-self: flex-end;
+}
+
+.msg.bot {
+  background: white;
+  border: 1px solid var(--border-light);
+  align-self: flex-start;
+}
+
+.msg.urgent {
+  border-left: 6px solid #ef4444;
+  background: #fee2e2;
+}
+
+/* Input area */
+.input-area {
+  display: flex;
+  padding: 14px;
+  gap: 10px;
+  background: white;
+}
+
+textarea {
+  flex: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  padding: 12px;
+  resize: none;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+/* ============================================================================
+   TRIAGE PILL
+============================================================================ */
+.triage-pill {
+  font-size: 12px;
+  background: #e0f2fe;
+  color: #0f172a;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.urgent-pill {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+/* ============================================================================
+   INFO SECTIONS
+============================================================================ */
+.info-section {
+  padding: 60px 24px;
+  background: transparent;
+}
+
+.info-section h2 {
+  font-size: 32px;
+  margin-bottom: 28px;
+  color: var(--teal-dark);
+}
+
+.info-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.info-card {
+  background: white;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.info-card h3 {
+  margin-top: 0;
+  color: var(--teal);
+  font-weight: 600;
+}
+
+/* ============================================================================
+   FOOTER
+============================================================================ */
+footer {
+  text-align: center;
+  padding: 30px 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 40px;
+}
