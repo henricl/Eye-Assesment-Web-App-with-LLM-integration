@@ -2,7 +2,7 @@
 
 AI-powered web application for assessing eye symptoms using large language models and safety-oriented reasoning.
 
-This project was developed as a prototype during my Computer Science Bachelor thesis.
+This project was developed as a prototype during my Computer Science Bachelor thesis at Technische Hochschule Ulm.
 
 ---
 
@@ -12,7 +12,7 @@ The application allows users to describe eye-related symptoms and receive struct
 
 The system integrates multiple safety layers to reduce the risk of unsafe medical advice.
 
-The goal is to explore how LLM-based systems can assist with symptom triage while maintaining responsible AI behavior.
+The goal of the project is to explore how LLM-based systems can assist with symptom triage while maintaining responsible AI behavior.
 
 ---
 
@@ -32,37 +32,44 @@ The goal is to explore how LLM-based systems can assist with symptom triage whil
 - Node.js
 - Firebase Functions
 - HTML / CSS
+- JavaScript
 - Azure AI
 - Hugging Face models
-- JavaScript
 
 ---
 
 ## Project Structure
 
-```
-functions/        # Backend cloud functions
-public/           # Frontend interface
-server.js         # Backend server logic
-firebase.json     # Firebase configuration
-package.json      # Project dependencies
-```
+functions/        Backend cloud functions  
+public/           Frontend interface  
+server.js         Node.js backend server logic  
+firebase.json     Firebase configuration  
+package.json      Project dependencies  
+
+---
+
+## Requirements
+
+Before running the project locally, install:
+
+- Node.js  
+  https://nodejs.org
+
+Node.js is required to install dependencies and run the server.
 
 ---
 
 ## Run Locally
 
-Install dependencies:
+Install project dependencies:
 
-```
 npm install
-```
 
 Start the application:
 
-```
 npm start
-```
+
+After starting the server, open the application in your browser.
 
 ---
 
@@ -70,4 +77,10 @@ npm start
 
 This system is a research prototype and **not a medical device**.
 
-It should not be used for medical diagnosis or treatment decisions.
+It should **not be used for medical diagnosis or treatment decisions**.
+
+---
+
+## License
+
+This project is licensed under the **MIT License**.
