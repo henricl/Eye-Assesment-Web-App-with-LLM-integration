@@ -1,9 +1,6 @@
 # Eye Assessment Web App with LLM Integration
 
 AI-powered web application for assessing eye symptoms using large language models and safety-oriented reasoning.
-
-This project was developed as a prototype during my Computer Science Bachelor thesis at Technische Hochschule Ulm.
-
 ---
 
 ## Overview
