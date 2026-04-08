@@ -80,4 +80,4 @@ It should **not be used for medical diagnosis or treatment decisions**.
 
 ## License
 
-This project is licensed under the **MIT License**.
+This project is licensed under the **Apache 2 License*.
